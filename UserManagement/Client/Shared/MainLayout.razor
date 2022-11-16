@@ -1,17 +1,53 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+<MudLayout>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+    <MudAppBar Elevation="1">
+        @if (_userIsAuthenticated)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" OnClick="DrawerToggle" Style="color: #fff" Edge="Edge.Start" />
+        }
+
+        <MudText Typo="Typo.h5" Class="ml-3">Панель управления</MudText>
+
+        <MudSpacer />
+
+        @*<LoginPartial />*@
+
+    </MudAppBar>
+
+    @if (_userIsAuthenticated)
+    {
+        <MudDrawer @bind-Open="@_drawerOpen" Elevation="1">
+            <NavMenu />
+        </MudDrawer>
+    }
+
+
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+
+@code {
+    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
+
+    private bool _userIsAuthenticated;
+    private bool _drawerOpen;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _userIsAuthenticated = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity!.IsAuthenticated;
+        _drawerOpen = _userIsAuthenticated;
+    }
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}
