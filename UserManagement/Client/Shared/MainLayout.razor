@@ -12,11 +12,11 @@
             <MudIconButton Icon="@Icons.Material.Filled.Menu" OnClick="DrawerToggle" Style="color: #fff" Edge="Edge.Start" />
         }
 
-        <MudText Typo="Typo.h5" Class="ml-3">Панель управления</MudText>
+        <MudText Typo="Typo.h5" Class="ml-3">Itransition Task4</MudText>
 
         <MudSpacer />
 
-        @*<LoginPartial />*@
+        <LoginPartial />
 
     </MudAppBar>
 
@@ -29,7 +29,9 @@
 
 
     <MudMainContent>
-        @Body
+        <CascadingValue Value="StateHasChanged">
+            @Body
+        </CascadingValue>
     </MudMainContent>
 </MudLayout>
 
@@ -42,7 +44,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _userIsAuthenticated = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity!.IsAuthenticated;
+        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        _userIsAuthenticated = user.Identity!.IsAuthenticated;
         _drawerOpen = _userIsAuthenticated;
     }
 

@@ -1,0 +1,25 @@
+﻿@page "/account/register"
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Регистрация</PageTitle>
+
+<div class="center-block">
+    <EditForm Model="@model" OnValidSubmit="OnValidSubmitAsync">
+        <DataAnnotationsValidator />
+        <MudCard Class="px-2 py-1" Style="width:30vw;">
+            <MudCardContent>
+                <MudTextField Label="Имя пользователя" @bind-Value="model.Username" For="@(() => model.Username)" />
+                <MudTextField Label="Email" Class="mt-3" @bind-Value="model.Email" For="@(() => model.Email)" />
+                <MudTextField Label="Пароль" Class="mt-3" @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+                <MudTextField Label="Подтвердить пароль" Class="mt-3" @bind-Value="model.RePassword" For="@(() => model.RePassword)" InputType="InputType.Password" />
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Зарегистрироваться</MudButton>
+            </MudCardActions>
+            <MudOverlay Visible="sendRequest" DarkBackground="true" Absolute="true">
+                <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+            </MudOverlay>
+        </MudCard>
+    </EditForm>
+</div>

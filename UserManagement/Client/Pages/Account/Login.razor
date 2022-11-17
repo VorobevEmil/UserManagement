@@ -1,0 +1,22 @@
+﻿@page "/account/login"
+
+<PageTitle>Вход</PageTitle>
+
+<div class="center-block">
+
+    <EditForm Model="@model" OnValidSubmit="OnValidSubmitAsync">
+        <DataAnnotationsValidator />
+        <MudCard Class="px-2 py-1" Style="width:30vw;">
+            <MudCardContent>
+                <MudTextField Label="Имя пользователя" @bind-Value="model.Username" For="@(() => model.Username)" />
+                <MudTextField Label="Пароль" Class="mt-3" @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Войти</MudButton>
+            </MudCardActions>
+            <MudOverlay Visible="sendRequest" DarkBackground="true" Absolute="true">
+                <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+            </MudOverlay>
+        </MudCard>
+    </EditForm>
+</div>

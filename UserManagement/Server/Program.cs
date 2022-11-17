@@ -1,18 +1,39 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
 using UserManagement.Server.Data;
 using UserManagement.Server.Models.DbModels;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true)
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.WriteIndented = true;
+    });
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configuration["ConnectionStrings:PostgreSQL"]));
-builder.Services.AddIdentity<User, IdentityRole>()
+builder.Services.AddIdentity<User, IdentityRole>(config =>
+{
+    config.Password.RequiredLength = 1;
+    config.SignIn.RequireConfirmedEmail = false;
+    config.Password.RequireUppercase = false;
+    config.Password.RequireNonAlphanumeric = false;
+    config.Password.RequireDigit = false;
+    config.Password.RequireLowercase = false;
+})
     .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
-
 
 var app = builder.Build();
 
@@ -37,7 +58,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseRouting();
-
 
 app.MapRazorPages();
 app.MapControllers();

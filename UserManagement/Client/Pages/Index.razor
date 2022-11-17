@@ -1,15 +1,28 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Необходима авторизация</PageTitle>
 
-<div class="login-block">
-    <MudPaper Class="text-center" style="max-width: 500px; border:#424242ff solid 1px;">
-        <div class="py-2 px-2">
-            <MudText Style="font-size: 30px; font-weight: 600; color: rgb(28,128,218); color: linear-gradient(90deg, rgba(28,128,218,1) 6%, rgba(84,74,226,1) 85%);">Необходима авторизация</MudText>
+<AuthorizeView>
+    <Authorized>
+        @{
+            NavigationManager.NavigateTo("management-users");
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div class="center-block">
+            <MudPaper Class="text-center" style="max-width: 500px; border:#424242ff solid 1px;">
+                <div class="py-2 px-2">
+                    <MudText Style="font-size: 30px; font-weight: 600; color: rgb(28,128,218); color: linear-gradient(90deg, rgba(28,128,218,1) 6%, rgba(84,74,226,1) 85%);">Необходима авторизация</MudText>
+                </div>
+                <div class="py-3 px-2" style="background-color:#404a53;">
+                    <MudText Style="font-size: 18px; color:#fbffff">Вы не сможете продолжить, пока не войдете в свой профиль</MudText>
+                    <div class="mt-2" style="width:100%; display:flex;">
+                        <MudButton Style="color:#fbffff; width: 100%; height: 32px; background: rgb(35,33,77); background: linear-gradient(90deg, rgba(35,33,77,1) 0%, rgba(87,105,217,1) 0%, rgba(96,75,167,1) 69%);" Variant="Variant.Filled" OnClick="@(new EventCallback(null, () => NavigationManager.NavigateTo("account/login")))">Войти</MudButton>
+                        <span class="mx-1"></span>
+                        <MudButton Style="color:#fbffff; width: 100%; height: 32px; background: rgb(221,18,60); background: linear-gradient(90deg, rgba(221,18,60,0.8046568969384629) 4%, rgba(231,9,81,0.8662815467984069) 99%);" Variant="Variant.Filled" OnClick="@(new EventCallback(null, () => NavigationManager.NavigateTo("account/register")))">Регистрация</MudButton>
+                    </div>
+                </div>
+            </MudPaper>
         </div>
-        <div class="py-3 px-2" style="background-color:#404a53;">
-            <MudText Style="font-size: 18px; color:#fbffff">Вы не сможете продолжить, пока не войдете в свой профиль</MudText>
-            <MudButton Class="mt-2" Style="color:#fbffff; width: 100%; height: 32px; background: rgb(35,33,77); background: linear-gradient(90deg, rgba(35,33,77,1) 0%, rgba(87,105,217,1) 0%, rgba(96,75,167,1) 69%);" Variant="Variant.Filled">Войти</MudButton>
-        </div>
-    </MudPaper>
-</div>
+    </NotAuthorized>
+</AuthorizeView>
