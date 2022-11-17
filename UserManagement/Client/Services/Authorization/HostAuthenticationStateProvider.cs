@@ -21,7 +21,7 @@ namespace UserManagement.Client.Services.Authorization
             if (userInfo.Claims != null)
             {
                 claimsIdentity = new ClaimsIdentity(
-                    userInfo.Claims.Select(t => new Claim(t.Item1, t.Item2)).ToList(),
+                    userInfo.Claims.Select(t => new Claim(t.Type, t.Value)).ToList(),
                     userInfo.AuthenticationType);
             }
 

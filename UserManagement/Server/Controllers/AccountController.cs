@@ -84,7 +84,7 @@ namespace UserManagement.Server.Controllers
             if (User.Identity!.IsAuthenticated)
             {
                 userInfo.AuthenticationType = User.Identity!.AuthenticationType!;
-                userInfo.Claims = User.Claims.Select((t) => new Tuple<string, string>(t.Type, t.Value)).ToList();
+                userInfo.Claims = User.Claims.Select(t => new ApiClaim(t.Type, t.Value)).ToList();
             }
             return Ok(userInfo);
         }
