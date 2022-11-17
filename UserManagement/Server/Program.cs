@@ -1,14 +1,11 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using System.Security.Claims;
-using System.Text.Encodings.Web;
 using UserManagement.Server.Data;
 using UserManagement.Server.Models.DbModels;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using UserManagement.Server.Interfaces;
+using UserManagement.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +19,8 @@ builder.Services.AddControllersWithViews(options => options.SuppressImplicitRequ
     });
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configuration["ConnectionStrings:PostgreSQL"]));
+builder.Services.AddScoped<IUsersDbContext>(provider => provider.GetService<AppDbContext>()!);
+
 builder.Services.AddIdentity<User, IdentityRole>(config =>
 {
     config.Password.RequiredLength = 1;
@@ -34,6 +33,8 @@ builder.Services.AddIdentity<User, IdentityRole>(config =>
     .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<IManagementUserService, ManagementUserService>();
 
 var app = builder.Build();
 

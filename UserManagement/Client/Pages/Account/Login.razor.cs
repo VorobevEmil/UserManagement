@@ -5,6 +5,7 @@ using MudBlazor;
 using System.Net;
 using System.Net.Http.Json;
 using UserManagement.Client.Services.Authorization;
+using UserManagement.Client.Shared;
 using UserManagement.Shared.Models.Account;
 
 namespace UserManagement.Client.Pages.Account
@@ -13,6 +14,8 @@ namespace UserManagement.Client.Pages.Account
     {
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         [Inject] private HostAuthenticationStateProvider HostAuthenticationStateProvider { get; set; } = default!;
+        [CascadingParameter] public MainLayout Parent { get; set; } = default!;
+
 
         private LoginModel model = new();
         private bool sendRequest = false;
@@ -26,7 +29,7 @@ namespace UserManagement.Client.Pages.Account
             {
                 Snackbar.Add("Пользователь успешно авторизован", Severity.Success);
                 HostAuthenticationStateProvider.RefreshState();
-                StateHasChanged();
+                await Parent.RefreshStateAsync();
                 NavigationManager.NavigateTo("/");
             }
             else

@@ -15,8 +15,9 @@
         <MudText Typo="Typo.h5" Class="ml-3">Itransition Task4</MudText>
 
         <MudSpacer />
-
-        <LoginPartial />
+        <CascadingValue Value="this">
+            <LoginPartial />
+        </CascadingValue>
 
     </MudAppBar>
 
@@ -29,7 +30,7 @@
 
 
     <MudMainContent>
-        <CascadingValue Value="StateHasChanged">
+        <CascadingValue Value="this">
             @Body
         </CascadingValue>
     </MudMainContent>
@@ -47,10 +48,16 @@
         var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
         _userIsAuthenticated = user.Identity!.IsAuthenticated;
         _drawerOpen = _userIsAuthenticated;
+        StateHasChanged();
     }
 
-    void DrawerToggle()
+    private void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    public async Task RefreshStateAsync()
+    {
+        await OnInitializedAsync();
     }
 }

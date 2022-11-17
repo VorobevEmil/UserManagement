@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using UserManagement.Server.Data;
+using UserManagement.Server.Interfaces;
 using UserManagement.Server.Models.DbModels;
 using UserManagement.Shared.Models.Account;
 
@@ -13,10 +16,13 @@ namespace UserManagement.Server.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        private readonly IManagementUserService _service;
+
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IManagementUserService service)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _service = service;
         }
 
         [HttpPost("Logout")]
@@ -27,7 +33,7 @@ namespace UserManagement.Server.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login([FromBody] LoginModel model, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
             {
@@ -40,6 +46,8 @@ namespace UserManagement.Server.Controllers
                 var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
                 if (result.Succeeded)
                 {
+                    await _service.SetLastLoginDateAsync(DateTime.UtcNow, user.Id, cancellationToken);
+
                     return Ok("Пользователь успешно авторизирован");
                 }
             }
@@ -60,7 +68,7 @@ namespace UserManagement.Server.Controllers
                 return Conflict("Пользователь уже существует в системе");
             }
 
-            User user = new User { Email = model.Email, UserName = model.Username };
+            User user = new User { Email = model.Email, UserName = model.Username, RegistrationDate = DateTime.Now };
 
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
