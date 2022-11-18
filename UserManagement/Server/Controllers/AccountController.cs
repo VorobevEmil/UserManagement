@@ -12,7 +12,7 @@ namespace UserManagement.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AccountController : BaseController
+    public class AccountController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
@@ -43,6 +43,11 @@ namespace UserManagement.Server.Controllers
             var user = await _userManager.FindByNameAsync(model.Username);
             if (user != null)
             {
+                if (user.IsBlocked && (await _signInManager.CheckPasswordSignInAsync(user,model.Password,false)).Succeeded)
+                {
+                    return Forbid("Ваш аккаунт заблокирован, авторизация не удалась");
+                }
+
                 var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
                 if (result.Succeeded)
                 {
@@ -68,7 +73,7 @@ namespace UserManagement.Server.Controllers
                 return Conflict("Пользователь уже существует в системе");
             }
 
-            User user = new User { Email = model.Email, UserName = model.Username, RegistrationDate = DateTime.Now };
+            User user = new User { Email = model.Email, UserName = model.Username, RegistrationDate = DateTime.UtcNow };
 
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)

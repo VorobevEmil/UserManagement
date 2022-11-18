@@ -2,6 +2,7 @@
 using UserManagement.Server.Common.Exceptions;
 using UserManagement.Server.Interfaces;
 using UserManagement.Server.Models.DbModels;
+using UserManagement.Shared.Contracts.ManagementUser.Requests;
 
 namespace UserManagement.Server.Services
 {
@@ -29,24 +30,17 @@ namespace UserManagement.Server.Services
             return await _context.Users.ToListAsync(cancellationToken);
         }
 
-        public async Task RefreshStatusBlockAsync(bool refresh, string id, CancellationToken cancellationToken)
+        public async Task RefreshStatusBlockAsync(UserBlockRequest userBlockRequest, CancellationToken cancellationToken)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == id, cancellationToken);
-            if (user == null)
-            {
-                throw new NotFoundException(nameof(User), id);
-            }
+            var users = await _context.Users.Where(user => userBlockRequest.UsersId.Contains(user.Id)).ToListAsync(cancellationToken);
 
-            user.IsBlocked = refresh;
+            users.ForEach(user => user.IsBlocked = userBlockRequest.StatusBlock);
             await _context.SaveChangesAsync(cancellationToken);
         }
-        public async Task DeleteAsync(string id, CancellationToken cancellationToken)
+        public async Task DeleteAsync(string userId, CancellationToken cancellationToken)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == id, cancellationToken);
-            if (user == null)
-            {
-                throw new NotFoundException(nameof(User), id);
-            }
+            var user = await GetByIdAsync(userId, cancellationToken);
+
             _context.Users.Remove(user);
             await _context.SaveChangesAsync(cancellationToken);
         }

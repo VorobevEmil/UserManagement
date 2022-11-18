@@ -34,6 +34,8 @@ builder.Services.AddIdentity<User, IdentityRole>(config =>
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
+builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddScoped<IManagementUserService, ManagementUserService>();
 
 var app = builder.Build();
@@ -55,10 +57,9 @@ app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseRouting();
 
 app.MapRazorPages();
 app.MapControllers();

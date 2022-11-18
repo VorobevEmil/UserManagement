@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserManagement.Server.Common.Exceptions;
 using UserManagement.Server.Interfaces;
 using UserManagement.Server.Models.DbModels;
+using UserManagement.Shared.Contracts.ManagementUser.Requests;
+using UserManagement.Shared.Contracts.ManagementUser.Responses;
 
 namespace UserManagement.Server.Controllers
 {
@@ -12,18 +15,21 @@ namespace UserManagement.Server.Controllers
     public class ManagementUserController : BaseController
     {
         private readonly IManagementUserService _service;
+        private readonly IMapper _mapper;
 
-        public ManagementUserController(IManagementUserService service)
+        public ManagementUserController(IManagementUserService service, IMapper mapper)
         {
             _service = service;
+            _mapper = mapper;
         }
 
         [HttpGet("GetById/{userId}")]
-        public async Task<ActionResult<User>> GetById(string userId, CancellationToken cancellationToken)
+        public async Task<ActionResult<UserResponse>> GetById(string userId, CancellationToken cancellationToken)
         {
             try
             {
-                return Ok(await _service.GetByIdAsync(userId, cancellationToken));
+                var user = await _service.GetByIdAsync(userId, cancellationToken);
+                return Ok(_mapper.Map<User, UserResponse>(user));
             }
             catch (NotFoundException)
             {
@@ -40,7 +46,8 @@ namespace UserManagement.Server.Controllers
         {
             try
             {
-                return Ok(await _service.GetAllAsync(cancellationToken));
+                var users = await _service.GetAllAsync(cancellationToken);
+                return Ok(_mapper.Map<List<User>, List<UserResponse>>(users));
             }
             catch (Exception)
             {
@@ -48,7 +55,7 @@ namespace UserManagement.Server.Controllers
             }
         }
 
-        [HttpDelete("Delete/userId")]
+        [HttpDelete("Delete/{userId}")]
         public async Task<IActionResult> Delete(string userId, CancellationToken cancellationToken)
         {
             try
@@ -67,11 +74,11 @@ namespace UserManagement.Server.Controllers
         }
 
         [HttpPost("RefreshStatusBlock")]
-        public async Task<IActionResult> RefreshStatusBlock(bool refresh, string userId, CancellationToken cancellationToken)
+        public async Task<IActionResult> RefreshStatusBlock(UserBlockRequest userBlockRequest, CancellationToken cancellationToken)
         {
             try
             {
-                await _service.RefreshStatusBlockAsync(refresh, userId, cancellationToken);
+                await _service.RefreshStatusBlockAsync(userBlockRequest, cancellationToken);
                 return Ok("Статус блокировки пользователя обновлен");
             }
             catch (NotFoundException)

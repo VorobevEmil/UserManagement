@@ -1,4 +1,51 @@
 ﻿@page "/management-users"
+@using UserManagement.Shared.Contracts.ManagementUser.Responses
 @attribute [Authorize]
 
 <PageTitle>Панель управления пользователями</PageTitle>
+
+<div class="container mt-12">
+    @if (Users != null)
+    {
+        <MudPaper Elevation="25" Class="my-2">
+            <MudToolBar>
+                <MudSpacer />
+                <MudButton Color="Color.Error" StartIcon="@Icons.Filled.Lock" OnClick="(async() => await RefreshStatusBlockAsync(true))">Block</MudButton>
+                <MudButton Color="Color.Primary" StartIcon="@Icons.Filled.LockOpen" OnClick="(async() => await RefreshStatusBlockAsync(false))">Unblock</MudButton>
+                <MudButton Color="Color.Secondary" StartIcon="@Icons.Filled.Delete" OnClick="(async() => await DeleteUsersAsync())">Delete</MudButton>
+            </MudToolBar>
+        </MudPaper>
+
+        <MudTable Items="Users" @bind-SelectedItems="SelectedUsers" MultiSelection="true">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Пользователи</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>Имя пользователя</MudTh>
+                <MudTh>Email</MudTh>
+                <MudTh>Дата регистрации</MudTh>
+                <MudTh>Дата последнего входа</MudTh>
+                <MudTh>Статус</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Username">@context.Username</MudTd>
+                <MudTd DataLabel="Email">@context.Email</MudTd>
+                <MudTd DataLabel="RegistrationDate">@context.RegistrationDate</MudTd>
+                <MudTd DataLabel="LastLoginDate">@context.LastLoginDate</MudTd>
+                <MudTd DataLabel="StatusBlock">@context.StatusBlock</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+    }
+    else
+    {
+        <div style="padding:50px; text-align:center;">
+            <MudText Typo="Typo.h4">Идёт загрузка пользователей</MudText>
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+        </div>
+    }
+</div>
