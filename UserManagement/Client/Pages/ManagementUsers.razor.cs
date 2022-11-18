@@ -87,7 +87,7 @@ namespace UserManagement.Client.Pages
             }
 
             Snackbar.Add("Пользователи удалены!", Severity.Success);
-            Users.RemoveAll((user => SelectedUsers.Select(t => t.Id).Contains(user.Id)));
+            Users.RemoveAll((user => SelectedUsers.Contains(user)));
             if (SelectedUsers.Select(t => t.Id).Contains(_currentUserId))
             {
                 await LogoutAsync();

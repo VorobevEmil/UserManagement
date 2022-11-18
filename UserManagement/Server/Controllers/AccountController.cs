@@ -37,7 +37,7 @@ namespace UserManagement.Server.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return StatusCode(400, "Данные не валидны");
+                return BadRequest("Данные не валидны");
             }
 
             var user = await _userManager.FindByNameAsync(model.Username);
@@ -45,7 +45,7 @@ namespace UserManagement.Server.Controllers
             {
                 if (user.IsBlocked && (await _signInManager.CheckPasswordSignInAsync(user,model.Password,false)).Succeeded)
                 {
-                    return Forbid("Ваш аккаунт заблокирован, авторизация не удалась");
+                    return Conflict("Ваш аккаунт заблокирован, авторизация не удалась");
                 }
 
                 var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
@@ -65,7 +65,7 @@ namespace UserManagement.Server.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return StatusCode(400, "Данные не валидны");
+                return BadRequest("Данные не валидны");
             }
 
             if (await _userManager.FindByEmailAsync(model.Email) != null || await _userManager.FindByNameAsync(model.Username) != null)
